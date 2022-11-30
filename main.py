@@ -6,7 +6,7 @@ import yaml
 import pandas as pd
 import zipfile
 
-from messsage import generate_message
+from message import generate_message
 from send_emails import santa_emails
 
 PARTECIPANTS_FILE = "participants.csv"
