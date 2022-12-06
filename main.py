@@ -15,6 +15,9 @@ OUTFOLDER = "out"
 ATTEMPTS = 100
 MAIL_SUBJECT = "SSID 2022"
 
+EMAIL_FIELD = "Posta elettronica"
+NAME_FIELD = "Nome"
+
 
 def load_exclusions(file):
     with open(file, 'r') as f:
@@ -23,8 +26,8 @@ def load_exclusions(file):
 
 
 def load_participants(csv):
-    parts = pd.read_csv(csv)
-    return parts[['email', 'name']]
+    parts = pd.read_csv(csv, sep=";")
+    return parts[[EMAIL_FIELD, NAME_FIELD]]
 
 
 def secret_santa(names, exclusions):
@@ -40,7 +43,9 @@ def secret_santa(names, exclusions):
         # shift
         shifted = shuffled.reindex(index=np.roll(shuffled.index, -1)).reset_index(drop=True)
         santa_table = pd.DataFrame({"santa": shuffled, "child": shifted})
-        santa_fail = not check_exclusions(santa_table, exclusions)
+        santa_fail = False
+        if exclusions is not None:
+            santa_fail = not check_exclusions(santa_table, exclusions)
         print("failed" if santa_fail else "succeeded!!")
         i += 1
     if santa_fail:
@@ -57,15 +62,27 @@ def integrity_checks(names, exclusions):
         msg = f"Duplicates in names!!\n" \
               f"{names[duplicates]}"
         raise ValueError(msg)
-    excluded_set = functools.reduce(set.union, (map(set, exclusions.values())))
-    if not excluded_set.issubset(set(names)):
-        msg = f"Set of exclusions:\n" \
-              f"{excluded_set}\n" \
-              f"Set of names:\n" \
-              f"{set(names)}\n" \
-              f"Missing:\n" \
-              f"{excluded_set - set(names)}\n"
-        raise ValueError(msg)
+    if exclusions is not None:
+        values_excluded_set = functools.reduce(set.union, (map(set, exclusions.values())))
+        keys_excluded_set = set(exclusions.keys())
+        if not values_excluded_set.issubset(set(names)):
+            msg = f"Set of exclusions values:\n" \
+                  f"{values_excluded_set}\n" \
+                  f"Set of names:\n" \
+                  f"{set(names)}\n" \
+                  f"Missing:\n" \
+                  f"{values_excluded_set - set(names)}\n"
+            raise ValueError(msg)
+        if not keys_excluded_set.issubset(set(names)):
+            msg = f"Set of exclusions values:\n" \
+                  f"{keys_excluded_set}\n" \
+                  f"Set of names:\n" \
+                  f"{set(names)}\n" \
+                  f"Missing:\n" \
+                  f"{keys_excluded_set - set(names)}\n"
+            raise ValueError(msg)
+    else:
+         print("WARNING: THERE ARE NO EXCLUSIONS")
 
 
 def check_exclusions(table, exclusions):
@@ -96,7 +113,9 @@ def generate_files(table, path):
         with zipfile.ZipFile(fname, "w") as zip_txt:
             zip_txt.write(txt)
 
+    os.chdir("..")
     table['message'] = list(map(get_message, table.iterrows()))
+    os.chdir(path)
     table['txt'] = list(map(generate_file, table.iterrows()))
     for i, (santa, child, messages, txt) in table.iterrows():
         generate_zip(santa, txt)
@@ -112,5 +131,5 @@ def generate_files(table, path):
 if __name__ == '__main__':
     participants = load_participants(PARTECIPANTS_FILE)
     exclusions = load_exclusions(EXCLUSION_FILE)
-    secret_santa(participants['name'], exclusions)
-    santa_emails(participants, OUTFOLDER, MAIL_SUBJECT)
+    secret_santa(participants[NAME_FIELD], exclusions)
+    santa_emails(participants[[EMAIL_FIELD, NAME_FIELD]], OUTFOLDER, MAIL_SUBJECT)

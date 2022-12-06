@@ -7,6 +7,8 @@ from email.message import EmailMessage
 
 from getpass import getpass
 
+from message import get_email
+
 
 def santa_emails(partecipants, path, subject):
     sender = input("Username: ")
@@ -25,7 +27,7 @@ def prepare_email(sender, receiver, subject, zipf):
     msg = EmailMessage()
     msg['Subject'] = subject
     msg['To'] = receiver
-    msg['From'] = sender
+    msg.set_content(get_email())
     msg.preamble = 'You will not see this in a MIME-aware mail reader.\n'
 
     directory, filename = os.path.split(zipf)

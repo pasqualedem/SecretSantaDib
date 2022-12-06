@@ -1,0 +1,8 @@
+Secret Santa:
+    After the deadline for the registration, a random extraction from a software will be made.
+    Each participant will be matched to be a Secret Santa of another one, called the child.
+    This procedure will build a long circular linked list.
+    Each participant have to do a gift to his "child" without telling anyone his identity.
+    Then, the day of the gift exchange, each Santa places its gift in a selected location with the name of the child on it.
+    When opening the gifts, each one have to guess who is his Secret Santa.
+
