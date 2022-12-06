@@ -120,10 +120,12 @@ def generate_files(table, path):
     for i, (santa, child, messages, txt) in table.iterrows():
         generate_zip(santa, txt)
 
+    w = np.random.rand() + 0.5
+    b = np.random.randint(0, 100)
     for i, (santa, child, message, txt) in table.iterrows():
         os.remove(txt)
         # hash check
-        print(f"{hash(santa)} -> {hash(child)}")
+        print(f"{round(w*hash(b*santa))} -> {round(w*hash(b*child))}")
 
     os.chdir("..")
 
@@ -132,4 +134,4 @@ if __name__ == '__main__':
     participants = load_participants(PARTECIPANTS_FILE)
     exclusions = load_exclusions(EXCLUSION_FILE)
     secret_santa(participants[NAME_FIELD], exclusions)
-    santa_emails(participants[[EMAIL_FIELD, NAME_FIELD]], OUTFOLDER, MAIL_SUBJECT)
+    # santa_emails(participants[[EMAIL_FIELD, NAME_FIELD]], OUTFOLDER, MAIL_SUBJECT)
