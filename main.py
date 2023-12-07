@@ -15,8 +15,8 @@ OUTFOLDER = "out"
 ATTEMPTS = 100
 MAIL_SUBJECT = "SSID 2022"
 
-EMAIL_FIELD = "Posta elettronica"
-NAME_FIELD = "Nome"
+EMAIL_FIELD = "Email"
+NAME_FIELD = "Nome e Cognome"
 
 
 def load_exclusions(file):
@@ -134,4 +134,4 @@ if __name__ == '__main__':
     participants = load_participants(PARTECIPANTS_FILE)
     exclusions = load_exclusions(EXCLUSION_FILE)
     secret_santa(participants[NAME_FIELD], exclusions)
-    # santa_emails(participants[[EMAIL_FIELD, NAME_FIELD]], OUTFOLDER, MAIL_SUBJECT)
+    santa_emails(participants[[EMAIL_FIELD, NAME_FIELD]], OUTFOLDER, MAIL_SUBJECT)
